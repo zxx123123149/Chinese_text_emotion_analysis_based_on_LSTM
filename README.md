@@ -5,7 +5,7 @@
 
 　　This project is based on LSTM (Short- and Short-Term Memory Network) to classify and predict Chinese text emotions. This experiment uses high-quality six-emotion micro-blog data, uses Jieba to serialize Chinese text, embeds words, and then uses LSTM algorithm to train the core classifier, adjust the model to achieve optimal accuracy. Finally, customize a prediction function to predict the emotion of the text by entering a piece of Chinese text.
 
-# ２数据介绍及预处理工作
+# ２　数据介绍及预处理工作
 　　本实验所用数据包含两个维度，一是中文的文本内容text，主要来自微博上的对话内容。二是是根据对话内容所打的情感标签，主要包含６大类，分别是Happiness、Sorrow、Fear、Disgust、None和Love。而我们的任务就是挖掘出训练数据集中的语义特征并对测试集进行分类预测。
 
 原始数据如下：
@@ -34,4 +34,28 @@
 ![image](https://user-images.githubusercontent.com/65441161/143914764-980a97a8-b20d-4fc7-96b6-12b96cd5be11.png)
 
 　　接下来的操作就是词嵌入。因为要想让计算机理解文字的含义，就必须用某种方法将计算机无法理解的文字内容转化为计算机可以理解的数字、矩阵向量、符号，使其在计算中获取信息。为了解决此问题，我们引入词嵌入，词嵌入的本质上是一个映射，它可以将词语或者短语映射到一个高维度的空间中形成词向量，如果有两个词的词义是相近的或者相同的，那么这两个词在映射后他们在空间中的距离也是接近的。目前比较流行的词嵌入主要有：谷歌在新闻数据集上训练出来的word2vec、斯坦福大学提出并且训练的GloVe。中文领域的词嵌入相对较少。在国内，腾讯人工智能实验室公布了特定于中文领域的词嵌入映射文件Tencent_AILab_ChineseEmbedding.txt，本文件将中文词汇分别映射到多维空间中，本词嵌入文件不论在词汇覆盖率还是在映射后的效果都很高，因此本文选择Tencent_AILab_ChineseEmbedding.txt进行词嵌入。由于需要对这么多个词中的每一个都映射为多维的向量并存储到文件中，这必然导致最后的文件占用的内存非常的大，解压出来的腾讯词嵌入文件大小达16.0G，而本计算机的内存只有8G，显然无法直接将文件载入内存中。为了解决此问题，本文专门创建了词嵌入文件的映射文件：embeddings_map_index.txt，该文件存储的是原词嵌入文件的索引，也就是只保留原词嵌入文件中的词汇字段、词汇在词嵌入文件中的起始位置、词汇在词嵌入文件中占用的长度。只要根据本映射文件就可以快速的从原词嵌入文件中读取需要的词向量，而不需将整个词嵌入文件读入内存。
+  
+# ２.４　文本填充  
+　　我们可知道将数据输入网络之前需要先对数据序列进行均匀地切分。由于文本的长度不一，因此不同文本序列化后的向量长度也是不同的，这样就不能进行统均匀地切分。为了解决这一问题，我们需要进行文本填充，先指定填充长度MAXLEN，若序列化后的文本向量长度小于MAXLEN，那么就用“0”进行填充，直到长度文本向量长度刚好为MAXLEN。若序列化后的文本向量长度大于MAXLEN，那么就将超出的部分截断，只能保留长度为MAXLEN的文本向量。
 
+# ３　模型的搭建与训练
+# ３.１　模型搭建  
+　　训练和测试的数据集都准备好以后,接下来我们要定义一个LSTM的序列模型:
+
+　　模型的第一次是嵌入层(Embedding)，它使用长度为100的向量来表示每一个词语
+　　SpatialDropout1D层在训练中每次更新时， 将输入单元的按比率随机设置为 0， 这有助于防止过拟合
+　　LSTM层包含100个记忆单元
+　　输出层为包含６个分类的全连接层
+　　由于是多分类，所以激活函数设置为'softmax'
+　　由于是多分类, 所以损失函数为分类交叉熵categorical_crossentropy
+  
+　　可以看到定义好之后如下图所示：
+  
+  ![image](https://user-images.githubusercontent.com/65441161/143916671-437c6794-149b-4c76-bc1b-905d962e2175.png)
+  
+  # ３.１　模型训练
+　　搭建好模型之后我们就需要对模型进行训练，开始我们设置３个训练周期，并定义好一些超参数（后边调优时会对参数进行微调）。同时我们可以画出模型的准确率和ｌｏｓｓ函数变化曲线，如下图所示：
+  ![image](https://user-images.githubusercontent.com/65441161/143917367-4606333e-e77c-4e96-bb96-a1b5d77ed16a.png)
+![image](https://user-images.githubusercontent.com/65441161/143917429-148cbfe8-367f-43d6-a80a-0f24af0cad32.png)
+![image](https://user-images.githubusercontent.com/65441161/143917449-ea32da26-fd3f-44c1-96b3-7b67b30f465f.png)
+　
