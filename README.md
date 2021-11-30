@@ -52,8 +52,7 @@
 　搭建好模型之后我们就需要对模型进行训练，开始我们设置３个训练周期，并定义好一些超参数（后边调优时会对参数进行微调）。同时我们可以画出模型的准确率和ｌｏｓｓ函数变化曲线，如下图所示：
  
   ![image](https://user-images.githubusercontent.com/65441161/143917367-4606333e-e77c-4e96-bb96-a1b5d77ed16a.png)
-![image](https://user-images.githubusercontent.com/65441161/144067117-344fa0d8-874c-4bf2-9bf5-b0777224c543.png)
-![image](https://user-images.githubusercontent.com/65441161/144067186-81e746f7-7195-4a03-9e6e-dea1ac440eb1.png)
+![image](https://user-images.githubusercontent.com/65441161/144067117-344fa0d8-874c-4bf2-9bf5-b0777224c543.png)![image](https://user-images.githubusercontent.com/65441161/144067186-81e746f7-7195-4a03-9e6e-dea1ac440eb1.png)
 
 　从上图中我们可以看见,随着训练周期的增加,模型在训练集中损失越来越。准确率越来越高；而在测试集中, 损失随着训练周期的增加由一开始的从大逐步变小,再逐步变大。准确率随着训练周期的增加由一开始的从小逐步变大，再逐步变小。
  # ３.３　模型评估
